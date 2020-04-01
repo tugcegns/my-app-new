@@ -118,6 +118,7 @@ class Playground extends React.Component{
         link.prop('vertices', [{x: 250 ,
                                 y: 200 }])
         link.attr('root/title', 'joint.shapes.standard.Link');
+        link.attr('line/stroke', '#31a2e7');
         link.labels([{
             attrs: {
                 text: {
@@ -126,6 +127,7 @@ class Playground extends React.Component{
             }
         }]);
         
+
         var link2 = new shapes.standard.Link();
         
         link2.prop('source', { id: rect5.id });
