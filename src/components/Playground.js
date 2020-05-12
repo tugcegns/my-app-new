@@ -19,39 +19,14 @@ class Playground extends React.Component{
             model: this.graph // yukarda oluşturduğumuz graphı buna atıyoruz.
         });
         
-        /*
-        this.paper.on('cell:pointerdown', 
-            (cellView, evt, x, y) => { 
-                //alert('cell view ' + cellView.model.id + ' was clicked'); 
-                
-            }
-        ); 
-        var circle = new shapes.standard.Circle();
-        circle.resize(100, 100);
-
-        circle.position(250, 10);
-        circle.attr('root/title', 'joint.shapes.standard.Circle');
-        circle.attr('label/text', 'Circle');
-        circle.attr('body/fill', 'lightblue');
-
-        // console.log(circle.position())
-
-        var circle2 = new shapes.standard.Circle();
-        circle2.resize(100, 100);
-        
-        circle2.position(450, 10);
-        circle2.attr('root/title', 'joint.shapes.standard.Circle');
-        circle2.attr('label/text', 'Circle 2');
-        circle2.attr('body/fill', 'lightgreen');
-        */
         var rect = new shapes.standard.Rectangle();
         rect.position(100, 250);
         rect.resize(150, 80);
         rect.attr({
             body: {
                 fill: '#cffdd4',
-                rx: 20,
-                ry: 20,
+                rx: 40,
+                ry: 40,
                 strokeWidth: 2
             },
             label: {
@@ -66,10 +41,9 @@ class Playground extends React.Component{
         rect3.attr({
             body: {
                 fill: '#cffdd4',
-                rx: 20,
-                ry: 20,
-                strokeWidth: 2,
-                strokeDasharray: '10,2'
+                rx: 40,
+                ry: 40,
+                strokeWidth: 2
             },
             label: {
                 text: 'View operations conducted',
@@ -84,8 +58,8 @@ class Playground extends React.Component{
         rect5.attr({
             body: {
                 fill: '#cffdd4',
-                rx: 20,
-                ry: 20,
+                rx: 40,
+                ry: 40,
                 strokeWidth: 2
             },
             label: {
@@ -100,8 +74,8 @@ class Playground extends React.Component{
         rect7.attr({
             body: {
                 fill: '#cffdd4',
-                rx: 20,
-                ry: 20,
+                rx: 40,
+                ry: 40,
                 strokeWidth:2
             },
             label: {
@@ -160,7 +134,14 @@ class Playground extends React.Component{
         }]);
         link.attr('line/stroke', 'blue');
         this.graph.addCells([rect, rect3, rect5, rect7, link,link2,link3]); // grapha oluşturduğumuz şekilleri ekliyoruz.       
+       
+       // this.graph.set('graphCustomProperty', true);
+        //this.graph.set('graphExportTime', Date.now());
+        //var jsonObject = this.graph.toJSON();
+        // this.graph.fromJSON({cells:[]});
     }
+
+
     render(){
         return(
             <div ref="playground" id="playground">
