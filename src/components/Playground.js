@@ -8,137 +8,24 @@ class Playground extends React.Component{
 
     constructor(props) {
         super(props);
-        this.graph = new dia.Graph(); //önce boş bir graph oluşturuyoruz.
-        
+        this.graph = new dia.Graph({ /* attributes of the graph */ }, { cellNamespace: shapes }); //önce boş bir graph oluşturuyoruz.
+ 
     }
     componentDidMount(){
         this.paper = new dia.Paper({ // Paper oluşturuyoruz çalışma sheeti gibi 
             el: ReactDOM.findDOMNode(this.refs.playground), //html' e koyarken hangi elemente atadığımızı belirtiyoruz.
+            cellViewNamespace: shapes,
             width: 1500,
             height: 700,
             model: this.graph // yukarda oluşturduğumuz graphı buna atıyoruz.
         });
-        
-        var rect = new shapes.standard.Rectangle();
-        rect.position(100, 250);
-        rect.resize(150, 80);
-        rect.attr({
-            body: {
-                fill: '#cffdd4',
-                rx: 40,
-                ry: 40,
-                strokeWidth: 2
-            },
-            label: {
-                text: 'Disposal events viewed' ,
-                fill: 'blue'
-            }
-        });
 
-        var rect3 = new shapes.standard.Rectangle();
-        rect3.position(300, 30);
-        rect3.resize(150, 80);
-        rect3.attr({
-            body: {
-                fill: '#cffdd4',
-                rx: 40,
-                ry: 40,
-                strokeWidth: 2
-            },
-            label: {
-                text: 'View operations conducted',
-                fill: 'blue',
-                fontSize: 13,
-                fontVariant: 'small-caps'
-            }
-        });
-        var rect5 = new shapes.standard.Rectangle();
-        rect5.position(300, 250);
-        rect5.resize(150, 80);
-        rect5.attr({
-            body: {
-                fill: '#cffdd4',
-                rx: 40,
-                ry: 40,
-                strokeWidth: 2
-            },
-            label: {
-                text: 'Map display viewed',
-                fill: 'blue',
-                fontSize: 13
-            }
-        });
-        var rect7 = new shapes.standard.Rectangle();
-        rect7.position(500, 250);
-        rect7.resize(150, 80);
-        rect7.attr({
-            body: {
-                fill: '#cffdd4',
-                rx: 40,
-                ry: 40,
-                strokeWidth:2
-            },
-            label: {
-                text: 'Recycling centers viewed',
-                fill: 'blue',
-                fontSize: 13
-            }
-        });
+    }
 
-        var link = new shapes.standard.Link();
-        
-        link.prop('source', { id: rect.id });
-        link.prop('target', {id: rect3.id });
-        link.prop('vertices', [{x: 250 ,
-                                y: 200 }])
-        link.attr('root/title', 'joint.shapes.standard.Link');
-        link.attr('line/stroke', '#31a2e7');
-        link.labels([{
-            attrs: {
-                text: {
-                    text: 'AND'
-                }
-            }
-        }]);
-        
-
-        var link2 = new shapes.standard.Link();
-        
-        link2.prop('source', { id: rect5.id });
-        link2.prop('target', {id: rect3.id });
-        link2.prop('vertices', [{x: 375 ,
-                                y: 200 }])
-        link2.attr('root/title', 'joint.shapes.standard.Link');
-        link2.labels([{
-            attrs: {
-                text: {
-                    text: 'AND'
-                }
-            }
-        }]);
-        link2.attr('line/stroke', 'blue');
-        var link3 = new shapes.standard.Link();
-        
-        link3.prop('source', { id: rect7.id });
-        link3.prop('target', {id: rect3.id });
-        link3.prop('vertices', [{x: 500 ,
-                                y: 200 }])
-        link3.attr('root/title', 'joint.shapes.standard.Link');
-        link3.attr('line/stroke', 'blue');
-        link3.labels([{
-            attrs: {
-                text: {
-                    text: 'AND'
-                }
-            }
-        }]);
-        link.attr('line/stroke', 'blue');
-        this.graph.addCells([rect, rect3, rect5, rect7, link,link2,link3]); // grapha oluşturduğumuz şekilleri ekliyoruz.       
-       
-       // this.graph.set('graphCustomProperty', true);
-        //this.graph.set('graphExportTime', Date.now());
-        //var jsonObject = this.graph.toJSON();
-        // this.graph.fromJSON({cells:[]});
+    componentWillReceiveProps(newProps) {
+        const { uploadedObject, jsonExportClicked, exportJSON } = newProps;
+        if(jsonExportClicked) exportJSON(this.graph.toJSON());
+        if(uploadedObject.cells) this.graph.fromJSON(uploadedObject);
     }
 
 

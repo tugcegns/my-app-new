@@ -15,7 +15,7 @@ class NavigationBar extends React.Component{
                     <Navbar.Brand style={{ fontSize: '30px', fontWeight: 'bold' }}>Integrating Goal Models</Navbar.Brand>
                     <Nav className="mr-auto"></Nav>
                     <Nav className="ml-auto">
-                        <ExportDropdown/>
+                        <ExportDropdown handleJSONExport={this.props.handleJSONExport}/>
                     </Nav>
                         
                         

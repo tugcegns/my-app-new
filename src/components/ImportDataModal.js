@@ -24,10 +24,12 @@ class ImportDataModal extends React.Component{
         const { fileInputLabel } = this.state;
         return(
             <div>
-            <div className="text-center mt-4">
-                <Button variant="info" onClick={this.showModalHandler}> Import Data </Button>
-            </div>
-            <FormModal show={this.state.showModal} onHide={this.hideModalHandler}></FormModal>
+                <div className="text-center mt-4">
+                    <Button variant="info" onClick={this.showModalHandler}> Import Data </Button>
+                </div>
+                <FormModal  show={this.state.showModal} 
+                            onHide={this.hideModalHandler} 
+                            setUploadedObject={this.props.setUploadedObject} ></FormModal>
             </div>
         );
     }

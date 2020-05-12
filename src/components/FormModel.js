@@ -18,10 +18,17 @@ class FormModal extends React.Component{
     onSubmit = () =>{
         try {
             let uploadedObject = JSON.parse(this.state.fileContent);
-            console.log(uploadedObject);
+            this.props.setUploadedObject(uploadedObject);
+            
+            for(var key in uploadedObject){
+                console.log(key + ": " + uploadedObject[key]);
+            }
+
             this.props.onHide();
         }catch (error) {
-            this.setState({ parseErrorMessage: "The file you are trying to upload has a badly formatted JSON string." });
+            this.setState({ 
+                parseErrorMessage: "The file you are trying to upload has a badly formatted JSON string." 
+            });
         }
     }
   

@@ -62,7 +62,7 @@ class SideBar extends React.Component{
                     </p>
                 </div>
                 <div>
-                    <ImportDataModal/> 
+                    <ImportDataModal setUploadedObject={this.props.setUploadedObject} /> 
                 </div>
             </div>
         );
