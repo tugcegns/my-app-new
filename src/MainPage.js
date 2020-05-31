@@ -18,6 +18,7 @@ class MainPage extends React.Component{
     setUploadedObject = uploadedObject => {
         this.setState({ uploadedObject });
     }
+
     handleJSONExport = () => {
         this.setState({ jsonExportClicked: true })
     }

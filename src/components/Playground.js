@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { dia, shapes } from 'jointjs';
+import { each } from 'underscore';
 
 class Playground extends React.Component{
 
@@ -22,20 +23,23 @@ class Playground extends React.Component{
     }
     createRole = label => {
         var r1 = new shapes.standard.Ellipse();
-        r1.resize(250, 150);
+        r1.resize(450, 350);
         r1.position(20, 20);
         r1.attr('root/tabindex', 3);
         r1.attr('root/title', 'joint.shapes.standard.Ellipse');
         r1.attr('body/fill', 'rgba(222,222,222,0.7)');
         r1.attr('body/fillOpacity', 0.5);
-        r1.attr('strokeDasharray', 5 );
+        r1.attr('body/strokeWidth', 1);
+        r1.attr('body/stroke', '#111111');
+        r1.attr('body/strokeDasharray', 5);
+        r1.attr('body/strokeDashoffset', 2.5);
         r1.attr('label/text', label);
         return r1;
     }
     createGoal = label => {
         var rect = new shapes.standard.Rectangle();
         rect.position(100, 250);
-        rect.resize(150, 80);
+        rect.resize(label.length * 7.5, 80);
         rect.attr({
             body: {
                 fill: '#cffdd4',
@@ -74,6 +78,7 @@ class Playground extends React.Component{
         for(var key in uploadedObject){
             var graphElements = [];
             const role = this.createRole(key);
+            graphElements.push(role);
             let nodes = uploadedObject[key];
             for (var i in nodes){
                 let node = nodes[i];
@@ -93,8 +98,64 @@ class Playground extends React.Component{
                 }
                 graphElements.push(goal);
             }
-            graphElements.push(role);
             this.graph.addCells(graphElements);
+            
+            this.graph.on('change:size', (cell, newPosition, opt) => {
+
+                if (opt.skipParentHandler) return;
+        
+                if (cell.get('embeds') && cell.get('embeds').length) {
+                    cell.set('originalSize', cell.get('size'));
+                }
+            });
+
+            this.graph.on('change:position', (cell, newPosition, opt) => {
+
+                if (opt.skipParentHandler) return;
+        
+                if (cell.get('embeds') && cell.get('embeds').length) {
+                    // If we're manipulating a parent element, let's store
+                    // it's original position to a special property so that
+                    // we can shrink the parent element back while manipulating
+                    // its children.
+                    cell.set('originalPosition', cell.get('position'));
+                }
+        
+                var parentId = cell.get('parent');
+                if (!parentId) return;
+        
+                var parent = this.graph.getCell(parentId);
+        
+                if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
+                if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
+        
+                var originalPosition = parent.get('originalPosition');
+                var originalSize = parent.get('originalSize');
+        
+                var newX = originalPosition.x;
+                var newY = originalPosition.y;
+                var newCornerX = originalPosition.x + originalSize.width;
+                var newCornerY = originalPosition.y + originalSize.height;
+        
+                each(parent.getEmbeddedCells(), function(child) {
+        
+                    var childBbox = child.getBBox();
+        
+                    if (childBbox.x < newX) { newX = childBbox.x; }
+                    if (childBbox.y < newY) { newY = childBbox.y; }
+                    if (childBbox.corner().x > newCornerX) { newCornerX = childBbox.corner().x; }
+                    if (childBbox.corner().y > newCornerY) { newCornerY = childBbox.corner().y; }
+                });
+        
+                // Note that we also pass a flag so that we know we shouldn't adjust the
+                // `originalPosition` and `originalSize` in our handlers as a reaction
+                // on the following `set()` call.
+                parent.set({
+                    position: { x: newX, y: newY },
+                    size: { width: newCornerX - newX, height: newCornerY - newY }
+                }, { skipParentHandler: true });
+            });
+
             
         }
     }
