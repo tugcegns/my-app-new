@@ -47,7 +47,7 @@ class MainPage extends React.Component{
                     <Col md="2" style={{ overflow: 'auto' }}>
                         <SideBar setUploadedObject={this.setUploadedObject} />
                     </Col>
-                    <Col md="10" className="pt-3" >
+                    <Col md="10" className="pt-3" style={{overflow:'auto'}} >
                         <Playground uploadedObject={uploadedObject} 
                                     jsonExportClicked={jsonExportClicked} 
                                     exportJSON={this.exportJSON}/>
