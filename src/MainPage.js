@@ -12,15 +12,21 @@ class MainPage extends React.Component{
         super(props);
         this.state = {
             uploadedObject: {},
-            jsonExportClicked: false
+            jsonExportClicked: false,
+            selectedTool: null
         }
     }
+
+    handleToolClick = type => {
+        this.setState({ selectedTool: type });
+    }
+
     setUploadedObject = uploadedObject => {
         this.setState({ uploadedObject });
     }
 
-    handleJSONExport = () => {
-        this.setState({ jsonExportClicked: true })
+    handleJSONExport = flag => {
+        this.setState({ jsonExportClicked: flag })
     }
     download = (filename, text) => {
         var element = document.createElement('a');
@@ -39,18 +45,24 @@ class MainPage extends React.Component{
     }
 
     render (){
-        const { uploadedObject, jsonExportClicked } = this.state;
+        const { uploadedObject, jsonExportClicked, selectedTool } = this.state;
         return(
             <div>
                 <NavigationBar handleJSONExport={this.handleJSONExport}/>
                 <Row>
                     <Col md="2" style={{ overflow: 'auto' }}>
-                        <SideBar setUploadedObject={this.setUploadedObject} />
+                        <SideBar setUploadedObject={this.setUploadedObject}
+                                 handleToolClick={this.handleToolClick}
+                                 selectedTool={selectedTool} />
                     </Col>
                     <Col md="10" className="pt-3" style={{overflow:'auto'}} >
                         <Playground uploadedObject={uploadedObject} 
+                                    setUploadedObject={this.setUploadedObject}
                                     jsonExportClicked={jsonExportClicked} 
-                                    exportJSON={this.exportJSON}/>
+                                    exportJSON={this.exportJSON}
+                                    selectedTool={selectedTool}
+                                    handleToolClick={this.handleToolClick}
+                                    handleJSONExport={this.handleJSONExport}/>
                     </Col>
                 </Row>
                 

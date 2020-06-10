@@ -7,8 +7,10 @@ import  htmlToImage from 'html-to-image';
 import  download  from 'downloadjs';
 import ImportDataModal from "./ImportDataModal";
 class SideBar extends React.Component{
-    
-    render(){
+
+    render(){ 
+        const { selectedTool } = this.props;
+        const selectedBorder = {border: '3px dashed #555555', padding: '5px', cursor: 'pointer'}
         return(
             <div style={{
                 width: '100%',
@@ -27,8 +29,13 @@ class SideBar extends React.Component{
                         borderTop: '1px solid #a1a1a1', 
                         borderBottom: '1px solid #a1a1a1'
                     }}>
-                    <p className="text-center" style={{ marginTop: '12%', fontSize: '22px' }}>
-                        Role
+                    <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
+                        <img src="/img/role.png" 
+                             width="64" 
+                             height="64" 
+                             alt="role"
+                             style={ selectedTool === "role" ? {...selectedBorder} : { cursor: 'pointer' }}
+                             onClick={() => this.props.handleToolClick('role')} />
                     </p>
                 </div>
 
@@ -37,8 +44,12 @@ class SideBar extends React.Component{
                     borderTop: '1px solid #e1e1e1', 
                     borderBottom: '1px solid #a1a1a1'
                 }}>
-                    <p className="text-center" style={{ marginTop: '12%', fontSize: '22px' }}>
-                        Goal
+                    <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
+                        <img src="/img/goal.png" 
+                             height="64"
+                             alt="goal"
+                             style={ selectedTool === "goal" ? {...selectedBorder} : { cursor: 'pointer' }}
+                             onClick={() => this.props.handleToolClick('goal')} />
                     </p>
                 </div>
 
@@ -57,8 +68,18 @@ class SideBar extends React.Component{
                     borderTop: '1px solid #e1e1e1', 
                     borderBottom: '1px solid #a1a1a1'
                 }}>
-                    <p className="text-center" style={{ marginTop: '12%', fontSize: '22px' }}>
-                        Relationships
+                    <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
+                        <img src="/img/and.png" 
+                            height="64"
+                            alt="and"
+                            style={ selectedTool === "and" ? {...selectedBorder, marginRight: '15%'} : { cursor: 'pointer', marginRight: '15%' }}
+                            onClick={() => this.props.handleToolClick('and')} />
+
+                        <img src="/img/or.png" 
+                            height="64"
+                            alt="or"
+                            style={ selectedTool === "or" ? {...selectedBorder} : { cursor: 'pointer' }}
+                            onClick={() => this.props.handleToolClick('or')} />
                     </p>
                 </div>
                 <div>
