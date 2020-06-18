@@ -85,7 +85,6 @@ class Playground extends React.Component{
             const { selectedTool } = this.props;
 
             var currentElement = elementView.model;
-            console.log(this.graph);
 
             if(selectedTool == "goal" && currentElement.get('type') == 'node.role'){
                 const goal = this.createGoal("Goal", eventX - 50, eventY - 25);
@@ -96,10 +95,11 @@ class Playground extends React.Component{
                 var { source } = this.state;
                 if(source){
                     if(currentElement.get('id') === source.get('id')) return;
-
                     const x = (source.get('position').x + currentElement.get('position').x) / 2;
                     const y = (source.get('position').y + currentElement.get('position').y) / 2 - 50;
                     const link = this.createLink(source.get('id'), currentElement.get('id'), selectedTool, x, y);
+                    const role = this.graph.getCell(currentElement.get('parent'));
+                    role.embed(link);
                     this.graph.addCell(link);
                     this.props.handleToolClick(null);
                 }else{
@@ -193,7 +193,7 @@ class Playground extends React.Component{
                 ref:'e',
                 refCx: '3%',
                 refCy: '10%',
-                refRCircumscribed: '9%'
+                refRCircumscribed: goalCount > 18 ? 0.05 : 0.09
                 
             },
             label: {
@@ -201,8 +201,8 @@ class Playground extends React.Component{
                 ref: 'c'
             }
         });
-        const size = (goalCount-1) * 35 + 350;
-
+        let size = (goalCount-1) * 40 + 350;
+        
         
         if(size > this.maxSize) {
             this.maxSize = size;
@@ -274,32 +274,111 @@ class Playground extends React.Component{
         link.labels([{
             attrs: {
                 text: {
-                    text: label
+                    text: label.toUpperCase()
                 }
             }
         }]);
         return link;
+    }
+    countChildren = nodes => {
+        let roleChildrenCount = 0;
+        for (var i in nodes){
+            let node = nodes[i];
+            if(node.type == 'goal') {
+                roleChildrenCount++;
+            }
+            if( !node.children || node.children.length === 0 ) continue;
+            
+            let children = node.children[0];
+            if(children.type == 'goal'){
+                for(var i in children.label){
+                    roleChildrenCount++;
+                }
+            }
+        }
+        return roleChildrenCount;
+    }
+
+    computeSubgoalCoordinates = n => {
+        const r = n * 40 + 100;
+        const startAngle = 180 / (2*n) + 180;
+        const angleInterval = 180 / n;
+        const pi = Math.PI;
+        let coords = [];
+
+        let angle = startAngle;
+        for(var i = 0; i < n; i++){
+            const q = angle * (pi / 180);
+            const x = r * Math.cos(q);
+            const y = r * Math.sin(q);
+
+            coords.push({ x, y });
+
+            angle += angleInterval;
+        }
+
+        return coords;
     }
 
     createGraph = uploadedObject => {
         for(var key in uploadedObject){
             var graphElements = [];
             let nodes = uploadedObject[key];
+        
+            const childrenCount = this.countChildren(nodes);
 
-            const role = this.createRole(key, nodes.length);
+            const role = this.createRole(key, childrenCount);
+            const roleSize = role.get('size');
+
+            let parentGoalOffsets = {x: roleSize.width / 3, y: 50};
+            let maxRadiusInRow = 0;
             //graphElements.push(role);
             for (var i in nodes){
                 let node = nodes[i];
+                let parentGoalCoordinates = {
+                    x: role.get('position').x + parentGoalOffsets.x,
+                    y: role.get('position').y + parentGoalOffsets.y
+                }
                 if(node.type == 'goal') {
-                    var goal = this.createGoal(node.label, role.get('position').x + 100, role.get('position').y + 100);
+                    var goal = this.createGoal(
+                        node.label, 
+                        parentGoalCoordinates.x, 
+                        parentGoalCoordinates.y
+                        );
                     role.embed(goal);
                 } // else createTask
                 if( !node.children || node.children.length === 0 )continue;
                 let children = node.children[0];
                 if(children.type == 'goal'){
+                    const numberOfSubgoals = children.label ? children.label.length : 0;
+                    const radius = numberOfSubgoals * 40 + 100;
+                    if(radius > maxRadiusInRow) maxRadiusInRow = radius;
+                    var subgoalCoordinates;
+                    if(numberOfSubgoals > 0){
+                        subgoalCoordinates = this.computeSubgoalCoordinates(numberOfSubgoals);
+                        parentGoalCoordinates.x += (radius*0.9)
+                        
+                    }
+                    parentGoalOffsets.x += 225 + (radius*0.9);
+                    if(parentGoalOffsets.x > (roleSize.width * 0.8)){
+                        parentGoalOffsets.x =  0;
+                        parentGoalOffsets.y += (125 + maxRadiusInRow);
+                        maxRadiusInRow = 0;
+                    }
+                    
                     for(var i in children.label){
-                        var subgoal = this.createGoal(children.label[i], role.get('position').x + 100, role.get('position').y + 100);
-                        var link = this.createLink(goal.id, subgoal.id, children.relationship, role.get('position').x, role.get('position').y);
+                        let childGoalCoordinates = {
+                            x: parentGoalCoordinates.x + subgoalCoordinates[i].x - (radius*0.6),
+                            y: parentGoalCoordinates.y - subgoalCoordinates[i].y
+                        }
+                        var subgoal = this.createGoal(children.label[i], childGoalCoordinates.x, childGoalCoordinates.y);
+                        var link = this.createLink(
+                            goal.id, 
+                            subgoal.id, 
+                            children.relationship, 
+                            (childGoalCoordinates.x + parentGoalCoordinates.x) / 2 - (radius*0.6),
+                            (childGoalCoordinates.y + parentGoalCoordinates.y) / 2 - 50
+                        );
                         role.embed(subgoal);
                         role.embed(link);
                         graphElements.push([subgoal,link])
@@ -339,16 +418,18 @@ class Playground extends React.Component{
             exportJSON(this.graph.toJSON());
             handleJSONExport(false);
         }
-        if(uploadedObject.cells) {
+        if(uploadedObject !== undefined && uploadedObject.cells) {
             this.graph.fromJSON(uploadedObject);
-            setUploadedObject({});
+            setUploadedObject(undefined);
         }
-        else if (uploadedObject !== {}) this.createGraph(uploadedObject);
+        else if (uploadedObject !== undefined) {
+            this.createGraph(uploadedObject);
+            this.props.setUploadedObject(undefined);
+        }
     }
 
     onLabelChange = newLabel => {
         const {selectedElement} = this.state;
-        console.log(selectedElement.get('type'))
         if(selectedElement.get('type') === "standard.Link") {
             selectedElement.labels([{
                 attrs: {

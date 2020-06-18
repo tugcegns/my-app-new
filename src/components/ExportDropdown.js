@@ -33,7 +33,7 @@ class ExportDropdown extends React.Component{
                 <NavDropdown.Item onClick={this.handlePNGExport} >as PNG </NavDropdown.Item>
                 <NavDropdown.Item onClick={this.handleJPEGExport}>as JPEG</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={() => this.props.handleJSONExport(true)}>as JSON</NavDropdown.Item>
+                <NavDropdown.Item onClick={(e) => this.props.handleJSONExport(true)}>as JSON</NavDropdown.Item>
             </NavDropdown>
         );
     }
