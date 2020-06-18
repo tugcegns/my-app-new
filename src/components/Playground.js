@@ -22,7 +22,7 @@ class Playground extends React.Component{
             el: ReactDOM.findDOMNode(this.refs.playground), //html' e koyarken hangi elemente atadığımızı belirtiyoruz.
             cellViewNamespace: shapes,
             width: 2500,
-            height: 2500,
+            height: 3000,
             model: this.graph // yukarda oluşturduğumuz graphı buna atıyoruz.
         });
         this.graph.on('change:size', (cell, newPosition, opt) => {
@@ -80,6 +80,22 @@ class Playground extends React.Component{
                 size: { width: newCornerX - newX, height: newCornerY - newY }
             }, { skipParentHandler: true });
         });
+        this.paper.on('cell:pointerclick', cellView => {
+            this.resetSelectedCell();
+            const { selectedTool } = this.props;
+            if(selectedTool !== null && selectedTool !== 'and' && selectedTool !== 'or') return;
+
+            var currentCell = cellView.model;
+
+            currentCell.attr('body/stroke', '#fa1234')
+            currentCell.attr('c/stroke', '#fa1234')
+            currentCell.attr('e/stroke', '#fa1234')
+            currentCell.attr('line/stroke', '#fa1234')
+            
+            this.setState({ selectedCell: currentCell });
+            
+        });
+        
         this.paper.on('element:pointerclick', (elementView, eventObject, eventX, eventY) => {
         
             const { selectedTool } = this.props;
@@ -93,14 +109,35 @@ class Playground extends React.Component{
                 this.props.handleToolClick(null);
             }else if((selectedTool === 'and' || selectedTool === 'or') && currentElement.get('type') === 'standard.Rectangle'){
                 var { source } = this.state;
+
                 if(source){
-                    if(currentElement.get('id') === source.get('id')) return;
+                    const sourceID = source.get('id');
+                    const targetID = currentElement.get('id');
+
+                    const sourceGoal = this.graph.getCell(sourceID);
+                    const cLinks = this.graph.getConnectedLinks(sourceGoal);
+            
+                    for(var i in cLinks){
+                        if
+                        (
+                            cLinks[i].get('source').id == targetID 
+                            || 
+                            cLinks[i].get('target').id == targetID
+                        )
+                        {
+                            this.setState({source: currentElement});
+                            return;
+                        } 
+                        
+                    }
+                    if(targetID === sourceID) return;
                     const x = (source.get('position').x + currentElement.get('position').x) / 2;
                     const y = (source.get('position').y + currentElement.get('position').y) / 2 - 50;
-                    const link = this.createLink(source.get('id'), currentElement.get('id'), selectedTool, x, y);
+                    const link = this.createLink(sourceID, targetID, selectedTool, x, y);
                     const role = this.graph.getCell(currentElement.get('parent'));
                     role.embed(link);
                     this.graph.addCell(link);
+                    this.resetSelectedCell();
                     this.props.handleToolClick(null);
                 }else{
                     this.setState({source: currentElement});
@@ -116,17 +153,21 @@ class Playground extends React.Component{
             this.setState({ showLabelModal:true, label, selectedElement: currentElement });
         });
 
+        /* Link label edit
         this.paper.on('link:pointerdblclick', linkView => {
             const link = linkView.model;
             const label = link.get('labels')[0].attrs.text.text;
             this.setState({ showLabelModal:true, label, selectedElement: link });
         });
+        */
 
         this.paper.on('blank:pointerclick', (eventObject, eventX, eventY) => {
 
+            this.resetSelectedCell();
+
             if(this.props.selectedTool !== "role") return;
 
-            this.createRole("Role", 0, {x: eventX, y: eventY});
+            this.createRole("Actor", 0, {x: eventX, y: eventY});
 
             this.props.handleToolClick(null);
             
@@ -176,6 +217,19 @@ class Playground extends React.Component{
         });
         shapes.node = {};
         shapes.node.role = this.CustomElement;
+
+        document.addEventListener("keydown", this.onKeyDown, false);
+    }
+
+    resetSelectedCell = () => {
+        const { selectedCell } = this.state;
+        if(selectedCell){
+            selectedCell.attr('body/stroke', '#000000')
+            selectedCell.attr('c/stroke', '#000000')
+            selectedCell.attr('e/stroke', '#000000')
+            selectedCell.attr('line/stroke', '#31a2e7')
+            this.setState({ selectedCell: null })
+        }
     }
     createRole = (label, goalCount, coordinates) => {
         
@@ -219,29 +273,6 @@ class Playground extends React.Component{
         this.offsetX += (size * 1.4);
         role.addTo(this.graph);
         return role;
-        /*
-        
-
-        /*
-        var r1 = new shapes.standard.Ellipse();
-        r1.resize(450, 350);
-        r1.position(20, 20);
-        r1.attr({
-                root: {
-                    tabindex :  3,
-                    title: 'joint.shapes.standard.Ellipse'},
-                body: {
-                    fill:  'rgba(222,222,222,0.7)', 
-                    fillOpacity : 0.5,
-                    strokeWidth :  1,
-                    stroke: '#111111',
-                    strokeDasharray: 5,
-                    strokeDashoffset: 2.5},
-                label: {
-                    text: label}
-        });
-        return r1;
-        */
     }
     createGoal = (label, x, y) => {
         var rect = new shapes.standard.Rectangle();
@@ -413,7 +444,7 @@ class Playground extends React.Component{
     }
 
     componentWillReceiveProps = newProps => {
-        const { uploadedObject, jsonExportClicked, exportJSON, handleJSONExport, setUploadedObject  } = newProps;
+        const { uploadedObject, jsonExportClicked, exportJSON, handleJSONExport, setUploadedObject, selectedTool  } = newProps;
         if(jsonExportClicked) {
             exportJSON(this.graph.toJSON());
             handleJSONExport(false);
@@ -426,6 +457,7 @@ class Playground extends React.Component{
             this.createGraph(uploadedObject);
             this.props.setUploadedObject(undefined);
         }
+        if(selectedTool) this.resetSelectedCell();
     }
 
     onLabelChange = newLabel => {
@@ -439,6 +471,15 @@ class Playground extends React.Component{
                 }
             }]);
         }else selectedElement.attr('label/text', newLabel);
+    }
+
+    onKeyDown = event => {
+        var keyId = event.keyCode;
+        const { selectedCell } = this.state;
+        if(keyId === 8 && selectedCell){
+            this.graph.removeCells([selectedCell]);
+            this.setState({ selectedCell: null })
+        }
     }
 
     render(){
