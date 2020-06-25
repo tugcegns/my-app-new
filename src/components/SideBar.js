@@ -23,7 +23,20 @@ class SideBar extends React.Component{
                 <p className="text-dark mb-4 text-center" style={{ fontSize: '20px', fontWeight: 'bold' }}> 
                     Toolbox 
                 </p>
-
+                <div style={{ 
+                    height: '100px', 
+                    borderTop: '1px solid #a1a1a1', 
+                    borderBottom: '1px solid #a1a1a1'
+                }}>
+                <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
+                    <img src="/img/boundry.png" 
+                    width="64" 
+                    height="64" 
+                    alt="boundry"
+                    style={ selectedTool === "boundry" ? {...selectedBorder} : { cursor: 'pointer' }}
+                    onClick={(e) => this.props.handleToolClick('boundry')} />
+                </p>
+                </div>
                 <div style={{ 
                         height: '100px', 
                         borderTop: '1px solid #a1a1a1', 
@@ -35,7 +48,7 @@ class SideBar extends React.Component{
                              height="64" 
                              alt="role"
                              style={ selectedTool === "role" ? {...selectedBorder} : { cursor: 'pointer' }}
-                             onClick={() => this.props.handleToolClick('role')} />
+                             onClick={(e) => this.props.handleToolClick('role')} />
                     </p>
                 </div>
 
@@ -49,7 +62,7 @@ class SideBar extends React.Component{
                              height="64"
                              alt="goal"
                              style={ selectedTool === "goal" ? {...selectedBorder} : { cursor: 'pointer' }}
-                             onClick={() => this.props.handleToolClick('goal')} />
+                             onClick={(e) => this.props.handleToolClick('goal')} />
                     </p>
                 </div>
 
@@ -69,17 +82,18 @@ class SideBar extends React.Component{
                     borderBottom: '1px solid #a1a1a1'
                 }}>
                     <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
+
                         <img src="/img/and.png" 
                             height="64"
                             alt="and"
                             style={ selectedTool === "and" ? {...selectedBorder, marginRight: '15%'} : { cursor: 'pointer', marginRight: '15%' }}
-                            onClick={() => this.props.handleToolClick('and')} />
+                            onClick={(e) => this.props.handleToolClick('and')} />
 
                         <img src="/img/or.png" 
                             height="64"
                             alt="or"
                             style={ selectedTool === "or" ? {...selectedBorder} : { cursor: 'pointer' }}
-                            onClick={() => this.props.handleToolClick('or')} />
+                            onClick={(e) => this.props.handleToolClick('or')} />
                     </p>
                 </div>
                 <div>

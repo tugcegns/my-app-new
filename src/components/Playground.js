@@ -14,7 +14,8 @@ class Playground extends React.Component{
         this.state = {
             maxSize: 0,
             showLabelModal: false,
-            source: null
+            source: null,
+            isBoundry: false
         }
     }
     componentDidMount(){
@@ -22,7 +23,7 @@ class Playground extends React.Component{
             el: ReactDOM.findDOMNode(this.refs.playground), //html' e koyarken hangi elemente atadığımızı belirtiyoruz.
             cellViewNamespace: shapes,
             width: 2500,
-            height: 3000,
+            height: 10000,
             model: this.graph // yukarda oluşturduğumuz graphı buna atıyoruz.
         });
         this.graph.on('change:size', (cell, newPosition, opt) => {
@@ -102,7 +103,7 @@ class Playground extends React.Component{
 
             var currentElement = elementView.model;
 
-            if(selectedTool == "goal" && currentElement.get('type') == 'node.role'){
+            if(selectedTool === "goal" && currentElement.get('type') == 'node.role'){
                 const goal = this.createGoal("Goal", eventX - 50, eventY - 25);
                 currentElement.embed(goal);
                 this.graph.addCell(goal);
@@ -165,9 +166,9 @@ class Playground extends React.Component{
 
             this.resetSelectedCell();
 
-            if(this.props.selectedTool !== "role") return;
+            if(this.props.selectedTool !== "role" && this.props.selectedTool !== "boundry" ) return;
 
-            this.createRole("Actor", 0, {x: eventX, y: eventY});
+            this.createRole("Actor", 0, {x: eventX, y: eventY}, this.state.isBoundry);
 
             this.props.handleToolClick(null);
             
@@ -186,7 +187,7 @@ class Playground extends React.Component{
                     
                 },
                 e: {
-                    strokeWidth :  1,
+                    strokeWidth :  2,
                     stroke: '#111111',
                     fill:  'rgba(222,222,222,0.7)',
                     fillOpacity : 0.5,
@@ -231,30 +232,55 @@ class Playground extends React.Component{
             this.setState({ selectedCell: null })
         }
     }
-    createRole = (label, goalCount, coordinates) => {
-        
+    createRole = (label, goalCount, coordinates, isBoundry) => {
+        console.log(isBoundry);
         var role = new this.CustomElement();
-        role.attr({
-            e: {
-                refRx: '65%',
-                refRy: '60%',
-                refCx: '25%',
-                refCy: '-25%',
-                refX: '25%',
-                refY: '75%',
-            },
-            c:{
-                ref:'e',
-                refCx: '3%',
-                refCy: '10%',
-                refRCircumscribed: goalCount > 18 ? 0.05 : 0.09
-                
-            },
-            label: {
-                text: label.replace(/ /g, "\n"),
-                ref: 'c'
-            }
-        });
+        if (isBoundry){
+            role.attr({
+                e: {
+                    refRx: '65%',
+                    refRy: '60%',
+                    refCx: '0%',
+                    refCy: '0%',
+                    refX: '25%',
+                    refY: '55%',
+                },
+                c:{
+                    ref:'e',
+                    refCx: '0%',
+                    refCy: '0%',
+                    
+                },
+                label: {
+                    text: "",
+                    ref: 'c'
+                }
+            });
+        } else {
+            role.attr({
+                e: {
+                    refRx: '65%',
+                    refRy: '60%',
+                    refCx: '25%',
+                    refCy: '-25%',
+                    refX: '25%',
+                    refY: '75%',
+                },
+                c:{
+                    ref:'e',
+                    refCx: '3%',
+                    refCy: '10%',
+                    refRCircumscribed: goalCount > 18 ? 0.05 : 0.09
+                    
+                },
+                label: {
+                    text: label.replace(/ /g, "\n"),
+                    ref: 'c'
+                }
+            });
+        }
+        
+        
         let size = (goalCount-1) * 40 + 350;
         
         
@@ -355,9 +381,8 @@ class Playground extends React.Component{
         for(var key in uploadedObject){
             var graphElements = [];
             let nodes = uploadedObject[key];
-        
-            const childrenCount = this.countChildren(nodes);
 
+            const childrenCount = this.countChildren(nodes);
             const role = this.createRole(key, childrenCount);
             const roleSize = role.get('size');
 
@@ -431,6 +456,9 @@ class Playground extends React.Component{
             case "role": 
                 this.createRole("Role", 0, {x,y});
                 break;
+            case "boundry":
+                this.createRole("Role", 0, {x,y}, this.state.isBoundry);
+                break;
                 /*
             case "goal": 
                 const goal = this.createGoal("Goal", x, y);
@@ -457,7 +485,13 @@ class Playground extends React.Component{
             this.createGraph(uploadedObject);
             this.props.setUploadedObject(undefined);
         }
-        if(selectedTool) this.resetSelectedCell();
+        if(selectedTool) {
+            this.resetSelectedCell();
+            this.setState({ isBoundry: false });
+        }
+        if(selectedTool === "boundry") {
+            this.setState({ isBoundry: true });
+        }
     }
 
     onLabelChange = newLabel => {
