@@ -6,6 +6,7 @@ import { dia, shapes } from 'jointjs';
 import { each } from 'underscore';
 import LabelModal from '../components/LabelModal';
 
+
 class Playground extends React.Component{
 
     constructor(props) {
@@ -14,16 +15,15 @@ class Playground extends React.Component{
         this.state = {
             maxSize: 0,
             showLabelModal: false,
-            source: null,
-            isBoundry: false
+            source: null
         }
     }
     componentDidMount(){
         this.paper = new dia.Paper({ // Paper oluşturuyoruz çalışma sheeti gibi 
             el: ReactDOM.findDOMNode(this.refs.playground), //html' e koyarken hangi elemente atadığımızı belirtiyoruz.
             cellViewNamespace: shapes,
-            width: 2500,
-            height: 10000,
+            width: 3000,
+            height: 3000,
             model: this.graph // yukarda oluşturduğumuz graphı buna atıyoruz.
         });
         this.graph.on('change:size', (cell, newPosition, opt) => {
@@ -166,9 +166,11 @@ class Playground extends React.Component{
 
             this.resetSelectedCell();
 
-            if(this.props.selectedTool !== "role" && this.props.selectedTool !== "boundry" ) return;
+            const { selectedTool } = this.props;
 
-            this.createRole("Actor", 0, {x: eventX, y: eventY}, this.state.isBoundry);
+            if(selectedTool !== "role" && selectedTool !== "boundary" ) return;
+
+            this.createRole("Actor", 0, {x: eventX, y: eventY}, selectedTool == 'boundary');
 
             this.props.handleToolClick(null);
             
@@ -220,6 +222,10 @@ class Playground extends React.Component{
         shapes.node.role = this.CustomElement;
 
         document.addEventListener("keydown", this.onKeyDown, false);
+
+        window.onbeforeunload = function() {
+            return "";
+        }.bind(this);
     }
 
     resetSelectedCell = () => {
@@ -232,18 +238,17 @@ class Playground extends React.Component{
             this.setState({ selectedCell: null })
         }
     }
-    createRole = (label, goalCount, coordinates, isBoundry) => {
-        console.log(isBoundry);
+    createRole = (label, goalCount, coordinates, isBoundary) => {
         var role = new this.CustomElement();
-        if (isBoundry){
+        if (isBoundary){
             role.attr({
                 e: {
                     refRx: '65%',
                     refRy: '60%',
-                    refCx: '0%',
-                    refCy: '0%',
+                    refCx: '25%',
+                    refCy: '-25%',
                     refX: '25%',
-                    refY: '55%',
+                    refY: '75%',
                 },
                 c:{
                     ref:'e',
@@ -287,12 +292,17 @@ class Playground extends React.Component{
         if(size > this.maxSize) {
             this.maxSize = size;
         }
-        
+
+        const paperSize = this.paper.getComputedSize();
+
         role.resize(size,size);
-        if(this.offsetX >= 2000){
+        if(this.offsetX >= paperSize.width - size - 50){
             this.offsetX = 100;
             this.offsetY += (this.maxSize * 1.4);
-            this.maxSize = 0;
+            if(this.offsetY > paperSize.height){
+                this.paper.setDimensions(paperSize.width, paperSize.height + (this.maxSize * 1.4) );
+            }
+            this.maxSize = size;
         }
         if(coordinates) role.position(coordinates.x, coordinates.y);
         else role.position(this.offsetX, this.offsetY);
@@ -381,9 +391,12 @@ class Playground extends React.Component{
         for(var key in uploadedObject){
             var graphElements = [];
             let nodes = uploadedObject[key];
-
             const childrenCount = this.countChildren(nodes);
-            const role = this.createRole(key, childrenCount);
+            var isBoundary = false;
+            if (nodes.length > 0 && nodes[0] == "null") {
+                isBoundary = true;
+            }
+            const role = this.createRole(key, childrenCount, false,  isBoundary);
             const roleSize = role.get('size');
 
             let parentGoalOffsets = {x: roleSize.width / 3, y: 50};
@@ -444,31 +457,10 @@ class Playground extends React.Component{
             }
             this.graph.addCells(graphElements);
         
-
+            const paperSize = this.paper.getComputedSize();
+            console.log(paperSize);
             
         }
-    }
-
-    handleToolAdd = e => {
-        const x = e.clientX - 350;
-        const y = e.clientY - 200;
-        switch (this.props.selectedTool){
-            case "role": 
-                this.createRole("Role", 0, {x,y});
-                break;
-            case "boundry":
-                this.createRole("Role", 0, {x,y}, this.state.isBoundry);
-                break;
-                /*
-            case "goal": 
-                const goal = this.createGoal("Goal", x, y);
-                this.graph.addCell(goal);
-                break;
-                */
-            default:
-                break;
-        }
-        this.props.handleToolClick(null);
     }
 
     componentWillReceiveProps = newProps => {
@@ -487,10 +479,6 @@ class Playground extends React.Component{
         }
         if(selectedTool) {
             this.resetSelectedCell();
-            this.setState({ isBoundry: false });
-        }
-        if(selectedTool === "boundry") {
-            this.setState({ isBoundry: true });
         }
     }
 

@@ -8,17 +8,29 @@ class NavigationBar extends React.Component{
     
     render (){
 
+        const { page } = this.props;
+
         return(
             <Navbar bg="dark" variant="dark" expand="lg" style={{ minHeight: '80px' }}>
+            
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                     <Navbar.Brand style={{ fontSize: '30px', fontWeight: 'bold' }}>Integrating Goal Models</Navbar.Brand>
-                    <Nav className="mr-auto"></Nav>
-                    <Nav className="ml-auto">
-                        <ExportDropdown handleJSONExport={this.props.handleJSONExport}/>
+                    <Nav className="mr-auto">
+                        <Nav.Link active={page === "home"} href="/">
+                            Home
+                        </Nav.Link>
+                        <Nav.Link active={page === "playground"} href="/playground">
+                            App
+                        </Nav.Link>
                     </Nav>
-                        
-                        
+                    {
+                        page === "playground" 
+                        &&
+                        <Nav className="ml-auto">
+                            <ExportDropdown handleJSONExport={this.props.handleJSONExport}/>
+                        </Nav>
+                    }
                     </Navbar.Collapse>
             </Navbar>
         );

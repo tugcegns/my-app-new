@@ -29,12 +29,12 @@ class SideBar extends React.Component{
                     borderBottom: '1px solid #a1a1a1'
                 }}>
                 <p className="text-center" style={{ marginTop: '8%', fontSize: '22px' }}>
-                    <img src="/img/boundry.png" 
+                    <img src="/img/boundary.png" 
                     width="64" 
                     height="64" 
-                    alt="boundry"
-                    style={ selectedTool === "boundry" ? {...selectedBorder} : { cursor: 'pointer' }}
-                    onClick={(e) => this.props.handleToolClick('boundry')} />
+                    alt="boundary"
+                    style={ selectedTool === "boundary" ? {...selectedBorder} : { cursor: 'pointer' }}
+                    onClick={(e) => this.props.handleToolClick('boundary')} />
                 </p>
                 </div>
                 <div style={{ 

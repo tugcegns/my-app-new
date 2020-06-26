@@ -48,7 +48,7 @@ class MainPage extends React.Component{
         const { uploadedObject, jsonExportClicked, selectedTool } = this.state;
         return(
             <div>
-                <NavigationBar handleJSONExport={this.handleJSONExport}/>
+                <NavigationBar handleJSONExport={this.handleJSONExport} page="playground"/>
                 <Row>
                     <Col md="2" style={{ overflow: 'auto' }}>
                         <SideBar setUploadedObject={this.setUploadedObject}
