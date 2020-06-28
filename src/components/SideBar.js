@@ -65,7 +65,8 @@ class SideBar extends React.Component{
                              onClick={(e) => this.props.handleToolClick('goal')} />
                     </p>
                 </div>
-
+                
+               {/* 
                 <div style={{ 
                     height: '100px', 
                     borderTop: '1px solid #e1e1e1', 
@@ -75,6 +76,7 @@ class SideBar extends React.Component{
                         Task
                     </p>
                 </div>
+                */}
 
                 <div style={{ 
                     height: '100px', 

@@ -149,9 +149,11 @@ class Playground extends React.Component{
             
         });
         this.paper.on('element:pointerdblclick', elementView => {
+            this.resetSelectedCell();
             const currentElement = elementView.model;
             const label = currentElement.attr('label').text;
-            this.setState({ showLabelModal:true, label, selectedElement: currentElement });
+            if(label !== "")
+                this.setState({ showLabelModal:true, label, selectedElement: currentElement });
         });
 
         /* Link label edit
@@ -393,7 +395,8 @@ class Playground extends React.Component{
             let nodes = uploadedObject[key];
             const childrenCount = this.countChildren(nodes);
             var isBoundary = false;
-            if (nodes.length > 0 && nodes[0] == "null") {
+            //if (nodes.length > 0 && nodes[0] == "null") {
+            if (key === "null") {
                 isBoundary = true;
             }
             const role = this.createRole(key, childrenCount, false,  isBoundary);

@@ -15,8 +15,11 @@ class LabelModal extends React.Component{
     }
     onSubmit = event =>{
         event.preventDefault();
-        this.props.onLabelChange(this.state.label);
-        this.props.onHide();
+        const { label } = this.state;
+        if(label.length >= 1){
+            this.props.onLabelChange(this.state.label);
+            this.props.onHide();
+        }
     }
     onLabelChange = (e) =>{
         const {value} = e.target;
@@ -40,9 +43,16 @@ class LabelModal extends React.Component{
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={this.onSubmit} id="label-form">
-                        <Form.Control type="text" 
-                                    value={this.state.label}
-                                    onChange={this.onLabelChange}  />
+                        <Form.Group>
+                            <Form.Control type="text" 
+                                        value={this.state.label}
+                                        onChange={this.onLabelChange} 
+                                        isValid={this.state.label.length >= 1}
+                                        isInvalid={this.state.label.length < 1} />
+                            <Form.Control.Feedback type="invalid">
+                                Actor label should be at least 1 character.
+                            </Form.Control.Feedback>
+                        </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
