@@ -139,6 +139,7 @@ class Playground extends React.Component{
                     role.embed(link);
                     this.graph.addCell(link);
                     this.resetSelectedCell();
+                    this.setState({ source: null });
                     this.props.handleToolClick(null);
                 }else{
                     this.setState({source: currentElement});

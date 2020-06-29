@@ -39,7 +39,7 @@ class Home extends React.Component{
                                     <Capital>U</Capital>pload a JSON file to create a model automatically,
                                 </li>
                                 <li>
-                                    <Capital>A</Capital>dd a new actor, boundary, goal or relationship bertween goals,
+                                    <Capital>A</Capital>dd a new actor, boundary, goal or relationship between goals,
                                 </li>
                                 <li>
                                     <Capital>R</Capital>ename the label of an actor or a goal with a double click,
@@ -49,17 +49,16 @@ class Home extends React.Component{
                                 </li>
                                 <li>
                                     <Capital>E</Capital>xport the goal model in JSON format 
-                                    after completing your work
+                                    after completing your work,
                                 </li>
                                 <li>
-                                    <Capital>I</Capital>mport the JSON data that you exported before and continue modifying
+                                    <Capital>I</Capital>mport the JSON data that you exported before and continue modifying,
                                 </li>
                                 <li>
-                                    <Capital>E</Capital>xport the model as PNG or JPEG to use in your paper or customer presentation.
-                                </li>
+                                    <Capital>E</Capital>xport the model as PNG or JPEG to use in your paper or customer presentation,                                </li>
                                 <li>
                                     <Capital>R</Capital>eposition elements(actors, boundaries, goals
-                                    and relationships)
+                                    and relationships).
                                 </li>
                             </ul>
                             <p className="text-center mt-4" >
