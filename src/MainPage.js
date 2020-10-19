@@ -16,7 +16,16 @@ class MainPage extends React.Component{
             selectedTool: null
         }
     }
-
+    
+    componentWillMount() {
+        debugger
+        //const { data } = 
+        this.setState({
+             uploadedObject: this.props.location.goalModel
+        })
+        console.log("dataaa:", this.state.uploadedObject)
+    }
+    
     handleToolClick = type => {
         this.setState({ selectedTool: type });
     }
@@ -45,6 +54,7 @@ class MainPage extends React.Component{
     }
 
     render (){
+        debugger
         const { uploadedObject, jsonExportClicked, selectedTool } = this.state;
         return(
             <div>

@@ -229,6 +229,16 @@ class Playground extends React.Component{
         window.onbeforeunload = function() {
             return "";
         }.bind(this);
+
+        if(this.props.uploadedObject !== undefined && this.props.uploadedObject.cells) {
+            this.graph.fromJSON(this.props.uploadedObject);
+            this.props.setUploadedObject(undefined);
+        }
+        else if (this.props.uploadedObject !== undefined) {
+            this.createGraph(this.props.uploadedObject);
+            this.props.setUploadedObject(undefined);
+        }
+
     }
 
     resetSelectedCell = () => {

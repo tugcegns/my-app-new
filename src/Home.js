@@ -62,7 +62,7 @@ class Home extends React.Component{
                                 </li>
                             </ul>
                             <p className="text-center mt-4" >
-                                <Button href="/playground" variant="outline-danger">Let's Start</Button>{' '}
+                                <Button href="/first" variant="outline-danger">Let's Start</Button>{' '}
                             </p>
                         </Col>
                     </Row>
